@@ -1,13 +1,13 @@
 import React from "react";
 import { Container, Heading } from "@chakra-ui/react";
-function Movies() {
+function Search() {
   return (
     <Container minW={"container.xl"}>
       <Heading as="h2" fontSize={"md"} textTransform={"uppercase"}>
-        Discover Movies
+        Search
       </Heading>
     </Container>
   );
 }
 
-export default Movies;
+export default Search;
