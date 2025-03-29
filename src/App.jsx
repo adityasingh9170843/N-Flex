@@ -6,6 +6,8 @@ import Movies from './pages/Movies';
 import Shows from './pages/Shows';
 import Home from './pages/Home';
 import Search from './Search/Search';
+
+import Details from './pages/Details';
 function App() {
   
   return (
@@ -17,6 +19,8 @@ function App() {
         <Route path="/Movies" element={<Movies />}  />
         <Route path="/Shows" element={<Shows />}  />
         <Route path="/Search" element={<Search />} />
+        <Route path="/:type/:id" element={<Details />} />
+        
       </Route>
     </Routes>
   </Container>

@@ -5,6 +5,7 @@ const apiKey = import.meta.env.VITE_API_KEY;
 
 export const imagePath = "https://image.tmdb.org/t/p/w500";
 export const imagePathOriginal = "https://image.tmdb.org/t/p/original";
+
 //Trending
 
 export const fetchTrending = async (timeWindow) => {
@@ -15,3 +16,10 @@ export const fetchTrending = async (timeWindow) => {
   return data?.results;
 };
 
+//MOVIES AND SERIES - DETAILS
+
+export const fetchDetails = async (type, id) => {
+  const res = await axios.get(`${baseUrl}/${type}/${id}?api_key=${apiKey}`);
+  const data = res.data;
+  return data;
+}

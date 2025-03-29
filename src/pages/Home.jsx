@@ -74,7 +74,7 @@ function Home() {
         gap={4}
         mt={10}
       >
-        {data && data.map((el,i) => Loading? (<Skeleton key={i} height={"300px"}/>) : (<CardComponent item={el} key={el.id}/>))}
+        {data && data.map((el,i) => Loading? (<Skeleton key={i} height={"300px"}/>) : (<CardComponent item={el} key={el.id} type={el?.media_type}/>))}
       </Grid>
     </Container>
   );
