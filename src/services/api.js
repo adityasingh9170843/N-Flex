@@ -23,3 +23,30 @@ export const fetchDetails = async (type, id) => {
   const data = res.data;
   return data;
 }
+
+//CREDITS
+
+export const fetchCredits = async (type, id) => {
+  const res = await axios.get(`${baseUrl}/${type}/${id}/credits?api_key=${apiKey}`);
+  const data = res.data;
+  return data;
+}
+
+
+//VIDEOS
+
+export const fetchVideos = async (type, id) => {
+  const res = await axios.get(`${baseUrl}/${type}/${id}/videos?api_key=${apiKey}`);
+  const data = res.data;
+  return data;
+}
+
+
+//DISCOVER
+
+export const fetchMovies = async (page) => {
+  const res = await axios.get(`${baseUrl}/discover/movie?api_key=${apiKey}&page=${page}`);
+  const data = res.data;
+  return data;
+}
+  
