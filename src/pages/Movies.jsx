@@ -9,9 +9,10 @@ function Movies() {
   const [Loading, SetLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [sortby, setSortby] = useState("popularity.desc");
   useEffect(() => {
     SetLoading(true);
-    fetchMovies(page)
+    fetchMovies(page, sortby)
       .then(
         (res) =>
           console.log(res) ||
@@ -21,13 +22,12 @@ function Movies() {
       )
       .catch((err) => console.log(err))
       .finally(() => SetLoading(false));
-  }, [page]);
+  }, [page, sortby]);
   const filter = createListCollection({
     items: [
       { label: "Popularity", value: "popularity.desc" },
       { label: "Top Rated", value: "vote_average" },
-      { label: "Angular", value: "angular" },
-      { label: "Svelte", value: "svelte" },
+      
     ],
   })
   return (
@@ -36,9 +36,9 @@ function Movies() {
         <Heading as="h2" fontSize={"md"} textTransform={"uppercase"}>
           Discover Movies
         </Heading>
-        <Select.Root collection={filter} size="sm" width="320px " onChange={(e) => console.log(e.target.value)}  >
+        <Select.Root collection={filter} size="sm" width="320px " onChange={(e) =>setSortby(e.target.value)}  >
       <Select.HiddenSelect />
-      <Select.Label>Select Filter</Select.Label>
+      
       <Select.Control>
         <Select.Trigger>
           <Select.ValueText placeholder="Select Filter" />
