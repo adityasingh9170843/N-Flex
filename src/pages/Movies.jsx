@@ -36,7 +36,8 @@ function Movies() {
         <Heading as="h2" fontSize={"md"} textTransform={"uppercase"}>
           Discover Movies
         </Heading>
-        <Select.Root collection={filter} size="sm" width="320px " onChange={(e) =>setSortby(e.target.value)}  >
+        <Select.Root collection={filter} size="sm" width="320px " onChange={(e) =>{setSortby(e.target.value)
+           setPage(1)}}  >
       <Select.HiddenSelect />
       
       <Select.Control>

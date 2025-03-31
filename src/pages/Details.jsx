@@ -202,7 +202,7 @@ function Details() {
             {credits?.length ===0 && <Text>No cast found</Text> }
             {credits?.map((item) => (
               <Box key={item.id} minW={"150px"}>
-                <Image src={`${imagePath}${item?.profile_path}`} alt={item?.name}/>
+                <Image src={`${imagePath}${item?.profile_path}`} alt={item?.name} w={"100%"} h={"225px"} objectFit={"cover"} rounded={"md"}/>
               </Box>
             ))}
         </Flex>

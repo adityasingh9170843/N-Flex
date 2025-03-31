@@ -15,6 +15,7 @@ function Navbar() {
             <Link to="/">Home</Link>
             <Link to="/Movies">Movies</Link>
             <Link to="/Shows">Shows</Link>
+            <Link to="/Search">Search</Link>
             <ColorModeButton />
         </HStack>
         </Flex>
