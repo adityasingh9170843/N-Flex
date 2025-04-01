@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { data, useParams } from "react-router-dom";
 import { fetchCredits, fetchDetails, fetchVideos, imagePathOriginal } from "../services/api";
 import { imagePath } from "../services/api";
 import {
@@ -23,6 +23,9 @@ import { TiTick } from "react-icons/ti";
 import { BiPlus } from "react-icons/bi";
 import VideoComponent from "../components/VideoComponent";
 import { FaClock } from "react-icons/fa6";
+import { useAuth } from "../context/authProvider";
+import { toaster,Toaster } from "../components/ui/toaster"
+import { useFireStore } from "../services/FireStore";
 function Details() {
   const router = useParams();
   const { type, id } = router;
@@ -31,6 +34,9 @@ function Details() {
   const [credits, SetCredits] = useState({});
   const [video, SetVideo] = useState(null);
   const [videos, SetVideos] = useState({});
+  const { user } = useAuth();
+  const {addtoWatchlist} = useFireStore();
+ 
   //SINGLE FETCH PROMISE
   // useEffect(() => {
   //   SetLoading(true);
@@ -79,6 +85,33 @@ function Details() {
       </Flex>
     );
   const releaseDate = type === "tv" ? data?.first_air_date : data?.release_date;
+
+  const handleSavetoWatchlist = async() => {
+
+    if(!user){
+      toaster.create({
+        description: "Log in to save to watchlist",
+        type: "error",
+        action: {
+          label:"x"
+        }
+      })
+    }
+
+    const datas ={
+     
+      id:data?.id,
+      type: type,
+      title: data?.title || data?.name,
+      poster_path: data?.poster_path,
+      release_Date: data?.release_date || data?.first_air_date,
+      vote_average: data?.vote_average,
+      overview: data?.overview
+    }
+    console.log(datas)
+    const dataId = data?.id?.toString()
+    addtoWatchlist(user?.uid,dataId,datas)
+  };
   return (
     <Box>
       <Box
@@ -155,13 +188,14 @@ function Details() {
                   display={"none"}
                   colorPalette={"green"}
                   variant={"outline"}
+                  
                 >
                   <HStack>
                     <TiTick />
                     <Text>In Watchlist</Text>
                   </HStack>
                 </Button>
-                <Button colorPalette={"green"} variant={"outline"}>
+                <Button colorPalette={"green"} variant={"outline"} onClick={handleSavetoWatchlist}>
                   <HStack>
                     <BiPlus />
                     <Text>Add to Watchlist</Text>
@@ -219,6 +253,7 @@ function Details() {
             ))}
         </Flex>
       </Container>
+      <Toaster />
     </Box>
   );
 }

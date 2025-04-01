@@ -8,6 +8,8 @@ import Home from './pages/Home';
 import Search from './Search/Search';
 
 import Details from './pages/Details';
+import WatchList from './pages/WatchList';
+import Protected from './components/routes/Protected';
 function App() {
   
   return (
@@ -20,6 +22,9 @@ function App() {
         <Route path="/Shows" element={<Shows />}  />
         <Route path="/Search" element={<Search />} />
         <Route path="/:type/:id" element={<Details />} />
+        <Route path="/watchlist" element={
+          <Protected><WatchList /></Protected>
+        } />
         
       </Route>
     </Routes>

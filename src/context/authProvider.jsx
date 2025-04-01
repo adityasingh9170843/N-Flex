@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
 
   function SignInWithGoogle() {
     const provider = new GoogleAuthProvider();
-    return signInWithPopup(provider);
+    return signInWithPopup(auth,provider);
   }
 
   function SignOut() {
@@ -26,6 +26,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
+        console.log("current user", currentUser);
         setUser(currentUser);
       } else {
         setUser(null);
