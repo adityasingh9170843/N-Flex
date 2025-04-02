@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { data, useParams } from "react-router-dom";
-import { fetchCredits, fetchDetails, fetchVideos, imagePathOriginal } from "../services/api";
+import {
+  fetchCredits,
+  fetchDetails,
+  fetchVideos,
+  imagePathOriginal,
+} from "../services/api";
 import { imagePath } from "../services/api";
 import {
   Spinner,
@@ -24,7 +29,7 @@ import { BiPlus } from "react-icons/bi";
 import VideoComponent from "../components/VideoComponent";
 import { FaClock } from "react-icons/fa6";
 import { useAuth } from "../context/authProvider";
-import { toaster,Toaster } from "../components/ui/toaster"
+import { toaster, Toaster } from "../components/ui/toaster";
 import { useFireStore } from "../services/FireStore";
 function Details() {
   const router = useParams();
@@ -34,9 +39,10 @@ function Details() {
   const [credits, SetCredits] = useState({});
   const [video, SetVideo] = useState(null);
   const [videos, SetVideos] = useState({});
+  const [isInWatchlist, setIsInWatchlist] = useState(false);
   const { user } = useAuth();
-  const {addtoWatchlist} = useFireStore();
- 
+  const { addtoWatchlist, checkIfInWatchlist, removefromWatchlist } = useFireStore();
+
   //SINGLE FETCH PROMISE
   // useEffect(() => {
   //   SetLoading(true);
@@ -46,6 +52,8 @@ function Details() {
   //     .finally(() => SetLoading(false));
 
   // }, [type, id]);
+
+  
 
   //MULTIPLE FETCH PROMISE
   useEffect(() => {
@@ -58,16 +66,17 @@ function Details() {
           fetchVideos(type, id),
         ]);
         setData(details);
-        SetCredits(credits?.cast.slice(0,10));
+        SetCredits(credits?.cast.slice(0, 10));
 
-        
         const video = videosData?.results?.find(
           (video) => video?.type === "Trailer"
         );
-        SetVideo(video)
-        console.log("trtr",video)
-        const videos = videosData?.results?.filter((video) => video.type !== "Trailer")?.splice(0,10);
-        SetVideos(videos)
+        SetVideo(video);
+        console.log("trtr", video);
+        const videos = videosData?.results
+          ?.filter((video) => video.type !== "Trailer")
+          ?.splice(0, 10);
+        SetVideos(videos);
       } catch (err) {
         console.log(err);
       } finally {
@@ -76,6 +85,15 @@ function Details() {
     };
     fetchData();
   }, [type, id]);
+
+  useEffect(() => {
+    if(!user){
+      setIsInWatchlist(false);
+      return
+    }
+    checkIfInWatchlist(user?.uid, id).then((res) => setIsInWatchlist(res));
+  }, [id, user, checkIfInWatchlist]);
+  
 
   console.log(credits);
   if (Loading)
@@ -86,32 +104,47 @@ function Details() {
     );
   const releaseDate = type === "tv" ? data?.first_air_date : data?.release_date;
 
-  const handleSavetoWatchlist = async() => {
-
-    if(!user){
+  const handleSavetoWatchlist = async () => {
+    if (!user) {
       toaster.create({
         description: "Log in to save to watchlist",
         type: "error",
         action: {
-          label:"x"
-        }
-      })
+          label: "x",
+        },
+      });
+      return; // Added return to prevent further execution if no user is logged in
     }
-
-    const datas ={
-     
-      id:data?.id,
+  
+    const datas = {
+      id: data?.id,
       type: type,
       title: data?.title || data?.name,
       poster_path: data?.poster_path,
       release_Date: data?.release_date || data?.first_air_date,
       vote_average: data?.vote_average,
-      overview: data?.overview
-    }
-    console.log(datas)
-    const dataId = data?.id?.toString()
-    addtoWatchlist(user?.uid,dataId,datas)
+      overview: data?.overview,
+    };
+  
+    console.log(datas);
+    const dataId = data?.id?.toString();
+    
+    
+    setIsInWatchlist(true);
+  
+    await addtoWatchlist(user?.uid, dataId, datas);
+  
+    
+    const isSetToWatchlist = await checkIfInWatchlist(user?.uid, dataId);
+    setIsInWatchlist(isSetToWatchlist);
   };
+
+  const handleRemoveFromWatchlist = async () => {
+    await removefromWatchlist(user?.uid, id);
+    const isSetToWatchlist = await checkIfInWatchlist(user?.uid, id);
+    setIsInWatchlist(isSetToWatchlist);
+  }
+  
   return (
     <Box>
       <Box
@@ -155,14 +188,14 @@ function Details() {
                   {type === "movie" && (
                     <Text fontSize={"sm"} color={"gray.400"}>
                       <Flex align={"center"} gap={1} ml={3}>
-                      <FaClock/>
-                      {data?.runtime} min
+                        <FaClock />
+                        {data?.runtime} min
                       </Flex>
                     </Text>
                   )}
                 </Flex>
               </Flex>
-              
+
               <Flex alignItems={"center"} gap={4}>
                 <ProgressCircle.Root
                   value={data?.vote_average * 10}
@@ -184,23 +217,30 @@ function Details() {
                 <Text display={{ base: "none", md: "block" }} color={"white"}>
                   User Score
                 </Text>
-                <Button
-                  display={"none"}
-                  colorPalette={"green"}
-                  variant={"outline"}
-                  
-                >
-                  <HStack>
-                    <TiTick />
-                    <Text>In Watchlist</Text>
-                  </HStack>
-                </Button>
-                <Button colorPalette={"green"} variant={"outline"} onClick={handleSavetoWatchlist}>
-                  <HStack>
-                    <BiPlus />
-                    <Text>Add to Watchlist</Text>
-                  </HStack>
-                </Button>
+                {isInWatchlist ? (
+                  <Button
+                    
+                    colorPalette={"green"}
+                    variant={"outline"}
+                    onClick={handleRemoveFromWatchlist}
+                  >
+                    <HStack>
+                      <TiTick />
+                      <Text>In Watchlist</Text>
+                    </HStack>
+                  </Button>
+                ) : (
+                  <Button
+                    colorPalette={"green"}
+                    variant={"outline"}
+                    onClick={handleSavetoWatchlist}
+                  >
+                    <HStack>
+                      <BiPlus />
+                      <Text>Add to Watchlist</Text>
+                    </HStack>
+                  </Button>
+                )}
               </Flex>
               <Text my={5} color={"white"} fontStyle={"italic"} fontSize={"sm"}>
                 {data?.tagline}
@@ -233,24 +273,31 @@ function Details() {
           Cast
         </Heading>
         <Flex mt={5} mb={10} gap={5} overflowX={"scroll"}>
-            {credits?.length ===0 && <Text>No cast found</Text> }
-            {credits?.map((item) => (
-              <Box key={item.id} minW={"150px"}>
-                <Image src={`${imagePath}${item?.profile_path}`} alt={item?.name} w={"100%"} h={"225px"} objectFit={"cover"} rounded={"md"}/>
-              </Box>
-            ))}
+          {credits?.length === 0 && <Text>No cast found</Text>}
+          {credits?.map((item) => (
+            <Box key={item.id} minW={"150px"}>
+              <Image
+                src={`${imagePath}${item?.profile_path}`}
+                alt={item?.name}
+                w={"100%"}
+                h={"225px"}
+                objectFit={"cover"}
+                rounded={"md"}
+              />
+            </Box>
+          ))}
         </Flex>
         <Heading as="h2" fontSize={"md"} textTransform={"uppercase"} mt={10}>
           Videos
         </Heading>
         <VideoComponent id={video?.key} />
         <Flex mt={5} mb={10} overflowX={"scroll"} gap={5}>
-            {videos?.length ===0 && <Text>No videos found</Text> }
-            {videos?.map((item) => (
-              <Box key={item.id} minW={"290px"}>
-                <VideoComponent id={item?.key} small />
-              </Box>
-            ))}
+          {videos?.length === 0 && <Text>No videos found</Text>}
+          {videos?.map((item) => (
+            <Box key={item.id} minW={"290px"}>
+              <VideoComponent id={item?.key} small />
+            </Box>
+          ))}
         </Flex>
       </Container>
       <Toaster />

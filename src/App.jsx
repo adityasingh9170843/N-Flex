@@ -23,7 +23,9 @@ function App() {
         <Route path="/Search" element={<Search />} />
         <Route path="/:type/:id" element={<Details />} />
         <Route path="/watchlist" element={
-          <Protected><WatchList /></Protected>
+          <Protected>
+            <WatchList />
+          </Protected>
         } />
         
       </Route>
