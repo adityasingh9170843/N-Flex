@@ -30,6 +30,8 @@ function Movies() {
       
     ],
   })
+  console.log("moviesgddgs", movies);
+  
   return (
     <Container minW={"container.xl"}>
       <Flex alignItems={"center"} gap={4} my={10}>
